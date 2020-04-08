@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tima.admin.mapper.SysDictTypeMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.tima.admin.entity.SysDictType">
+        <id column="id" property="id"/>
+        <result column="dict_name" property="dictName"/>
+        <result column="dict_type" property="dictType"/>
+        <result column="status" property="status"/>
+        <result column="is_display" property="isDisplay"/>
+        <result column="remark" property="remark"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="created_date" property="createdDate"/>
+        <result column="last_modified_by" property="lastModifiedBy"/>
+        <result column="last_modified_date" property="lastModifiedDate"/>
+        <result column="version" property="version"/>
+        <result column="delete_flag" property="deleteFlag"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, dict_name, dict_type, status, is_display, remark, created_by, created_date, last_modified_by, last_modified_date, version, delete_flag
+    </sql>
+
+
+    <resultMap id="selectTypeAndDataMap" type="com.tima.admin.vo.SysDictTypeVO">
+        <id column="id" property="id"/>
+        <result column="dict_name" property="dictName"/>
+        <result column="dict_type" property="dictType"/>
+        <collection property="SysDictDataVOs" ofType="com.tima.admin.vo.SysDictDataVO">
+            <id column="dictDataId" property="id"/>
+            <result column="dict_code" property="dictCode"/>
+            <result column="dict_sort" property="dictSort"/>
+            <result column="dict_value" property="dictValue"/>
+            <result column="remark" property="remark"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectTypeAndData" resultMap="selectTypeAndDataMap">
+        SELECT
+            type.id,
+            DATA.dict_code,
+            type.dict_name,
+            type.dict_type,
+            DATA.id AS dictDataId,
+            DATA.dict_value,
+            DATA.remark
+        FROM
+            sys_dict_type type
+            LEFT JOIN sys_dict_data DATA ON type.dict_type = DATA.dict_type
+            AND DATA.delete_flag = '0'
+            AND DATA.`status` = 0
+        WHERE
+            type.delete_flag = '0'
+            AND type.`status` = 0
+            <if test="null!=dictType">
+                AND type.dict_type=#{dictType}
+            </if>
+    </select>
+
+
+    <!-- 
+    <select id="selectVehicleCustomList" resultMap="VehicleCustomResultMap">
+		SELECT
+		v.created_by,
+		v.last_modified_by,
+		v.color,
+		v.driving_license_expired_date,
+		v.driving_license_no,
+		v.engine_no,
+		v.`no`,
+		v.plate_license_no,
+		v.`status`,
+		v.vin,
+		s.`name` AS vehicle_series_name,
+		b.`name` AS vehicle_brand_name,
+	    l.`no` as vehicle_location_no,
+	    l.`name` as vehicle_location_name
+	FROM
+		vehicle v
+		LEFT JOIN vehicle_resource vr ON v.id = vr.vehicle_id
+		LEFT JOIN location_resource lr ON vr.location_resource_id = lr.id
+		LEFT JOIN location l ON l.id = lr.location_id
+		LEFT JOIN vehicle_model vm ON v.model_id = vm.id
+		LEFT JOIN series s ON v.series_id = s.id
+		LEFT JOIN brand b ON s.brand_id = b.id 
+	WHERE
+		v.delete_flag = '0'
+		 <if test="plateLicenseNo != null">
+		 AND v.plate_license_no = #{plateLicenseNo}
+		 </if>
+		 <if test="operationStatus != null">
+		 AND vr.operation_status = #{operationStatus}
+		 </if>
+		 <if test="vehicleLocationNo != null">
+		 AND l.`no` = #{vehicleLocationNo}
+		 </if>
+	</select>    
+     -->
+</mapper>

@@ -1,0 +1,35 @@
+spring:
+    cloud:
+        bus:
+            trace:
+                enabled: true
+        config:
+            name: application-jac-admin
+            #profile: dev
+            profile: sit
+            #profile: uat
+            #profile: prod
+            label: jac
+#            #uri: http://192.168.25.31:8001/ #江淮集团uat
+#            #uri: http://172.20.20.70:8001/  #dev
+#            uri: http://172.20.20.75:8001/  #sit
+#            #uri: http://192.168.19.53:8001/,http://192.168.19.54:8001/  #prod
+            discovery:
+                enabled: true
+                serviceId: dk-gate-config-server
+
+eureka:
+
+      instance:
+          prefer-ip-address: true
+# 心跳检测检测与续约时间
+# 测试时将值设置设置小些，保证服务关闭后注册中心能及时踢出服务
+          lease-renewal-interval-in-seconds: 1
+          lease-expiration-duration-in-seconds: 2
+      client:
+          serviceUrl:
+              #defaultZone: http://eureka:eureka@172.20.20.70:8761/eureka/  #dev
+              defaultZone: http://eureka:eureka@172.20.20.75:8761/eureka/  #sit
+          #defaultZone: http://eureka:eureka@192.168.19.53:8761/eureka/,http://eureka:eureka@192.168.19.54:8761/eureka/ #江淮集团prod
+
+

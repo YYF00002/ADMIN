@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+        namespace="com.tima.admin.mapper.UserBaseInformationMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap"
+               type="com.tima.admin.vo.UserBaseInformationVO" autoMapping="true">
+        <id column="id" property="id"/>
+        <result column="no" property="no"/>
+        <result column="user_name" property="userName"/>
+        <result column="short_user_name" property="shortUserName"/>
+        <result column="user_real_name" property="userRealName"/>
+        <result column="sex" property="sex"/>
+        <result column="user_code" property="userCode"/>
+        <result column="password" property="password"/>
+        <result column="email" property="email"/>
+        <result column="phone" property="phone"/>
+        <result column="real_phone" property="realPhone"/>
+        <result column="user_status" property="userStatus"/>
+        <result column="id_cards" property="idCards"/>
+        <result column="authentication_status"
+                property="authenticationStatus"/>
+        <result column="init_user" property="initUser"/>
+        <result column="user_down_time" property="userDownTime"/>
+        <result column="emergency_contact_name"
+                property="emergencyContactName"/>
+        <result column="emergency_contact_phone"
+                property="emergencyContactPhone"/>
+        <result column="head_url" property="headUrl"/>
+        <result column="personal_signature"
+                property="personalSignature"/>
+        <result column="user_type" property="userType"/>
+        <result column="attribute1" property="attribute1"/>
+        <result column="attribute2" property="attribute2"/>
+        <result column="attribute3" property="attribute3"/>
+        <result column="attribute4" property="attribute4"/>
+        <result column="attribute5" property="attribute5"/>
+        <result column="attribute6" property="attribute6"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="created_date" property="createdDate"/>
+        <result column="last_modified_by" property="lastModifiedBy"/>
+        <result column="last_modified_date" property="lastModifiedDate"/>
+        <result column="version" property="version"/>
+        <result column="delete_flag" property="deleteFlag"/>
+        <result column="roleName" property="roleName"/>
+        <result column="roleId" property="roleId"/>
+        <collection property="entitys"
+                    ofType="com.tima.admin.vo.LabelEntityVO">
+            <id column="label_id" property="id"/>
+            <result column="entity" property="entity"/>
+            <result column="attr_id" property="attrId"/>
+        </collection>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+		id, no, user_name, short_user_name, user_real_name, sex,
+		user_code,
+		password, email, phone,real_phone, user_status, id_cards,
+		authentication_status,
+		init_user, user_down_time,
+		emergency_contact_name,
+		emergency_contact_phone, head_url,
+		personal_signature,user_type, attribute1,
+		attribute2, attribute3,
+		attribute4, attribute5, attribute6,
+		created_by, created_date,
+		last_modified_by, last_modified_date,
+		version, delete_flag
+	</sql>
+
+    <select id="selectAll" resultMap="BaseResultMap"
+            parameterType="com.tima.admin.dto.UserBaseInformationDTO">
+        SELECT
+        A.id,
+        A.NO,
+        A.user_name,
+        A.short_user_name,
+        A.user_real_name,
+        A.sex,
+        A.user_code,
+        A.email,
+        A.phone,
+        A.real_phone,
+        A.user_status,
+        A.id_cards,
+        A.authentication_status,
+        A.init_user,
+        A.user_down_time,
+        A.emergency_contact_name,
+        A.emergency_contact_phone,
+        A.personal_signature
+        FROM
+        user_base_information A
+        WHERE
+        A.delete_flag = 0
+        and A.user_type='02'
+        <if test="null!=no">
+            AND A.no=#{no}
+        </if>
+        <if test="null!=userName">
+            AND A.user_name LIKE concat(concat('%',#{userName}),'%')
+        </if>
+        <if test="null!=email">
+            AND A.email LIKE concat(concat('%',#{email}),'%')
+        </if>
+        <if test="null!=phone">
+            AND A.phone LIKE concat(concat('%',#{phone}),'%')
+        </if>
+    </select>
+
+    <select id="selectUserDeatil" resultMap="BaseResultMap">
+        SELECT
+        D.role_name AS roleName,
+        D.id AS roleId,
+        A.id,
+        A.NO,
+        A.user_name,
+        A.short_user_name,
+        A.user_real_name,
+        A.sex,
+        A.user_code,
+        A.email,
+        A.phone,
+        A.real_phone,
+        A.user_status,
+        A.id_cards,
+        A.authentication_status,
+        A.init_user,
+        A.user_down_time,
+        A.emergency_contact_name,
+        A.emergency_contact_phone,
+        A.personal_signature,
+        B.image_url head_url,
+        li.id as label_id,
+        li.label_name as entity,
+        li.attr_id
+        FROM
+        user_base_information A
+        LEFT JOIN image_relation B ON A.id = B.image_type_id
+        LEFT JOIN user_role_relation C ON C.user_id = A.id
+        LEFT JOIN user_role D ON D.id = C.user_role_id
+        AND B.delete_flag = 0
+        LEFT JOIN label_entity le ON le.uid=A.id AND le.delete_flag='0'
+        LEFT JOIN label_info li ON li.id=le.label_id AND li.delete_flag='0'
+        WHERE
+        A.delete_flag = 0
+        <if test="null!=no">
+            AND A.no=#{no}
+        </if>
+    </select>
+
+    <select id="searchUserBaseInformationMany"
+            resultMap="BaseResultMap">
+        SELECT
+        ir.image_url,
+        ubi.id,
+        ubi.NO,
+        ubi.user_name,
+        ubi.short_user_name,
+        ubi.user_real_name,
+        ubi.sex,
+        ubi.user_code,
+        ubi.email,
+        ubi.phone,
+        ubi.real_phone,
+        ubi.user_status,
+        ubi.id_cards,
+        ubi.authentication_status,
+        ubi.init_user,
+        ubi.user_down_time,
+        ubi.emergency_contact_name,
+        ubi.emergency_contact_phone,
+        ubi.personal_signature ,
+        li.label_name as entity
+        FROM
+        user_base_information ubi
+        LEFT JOIN image_relation ir ON ir.image_type_id = ubi.id
+        LEFT JOIN label_entity le ON le.uid=ubi.id AND le.delete_flag='0'
+        LEFT JOIN label_info li ON li.id=le.label_id AND li.delete_flag='0'
+        where
+        <if test="null!=nos">
+            ubi.no in
+            <foreach item="noReq" index="index" collection="nos" open="("
+                     separator="," close=")">
+                #{noReq}
+            </foreach>
+        </if>
+    </select>
+
+    <select id="selectUserInformationAndIntegral" resultType="com.tima.admin.vo.UserBaseInformationVO">
+        SELECT
+        ubi.id,
+        ubi.NO,
+        ubi.user_name,
+        ubi.short_user_name,
+        ubi.user_real_name,
+        ubi.sex,
+        ubi.user_code,
+        ubi.email,
+        ubi.phone,
+        ubi.real_phone,
+        ubi.user_status,
+        ubi.id_cards,
+        ubi.authentication_status,
+        ubi.init_user,
+        ubi.user_down_time,
+        ubi.emergency_contact_name,
+        ubi.emergency_contact_phone,
+        ubi.personal_signature,
+        ic.count integral
+        FROM
+        user_base_information ubi
+        LEFT JOIN third_party_user_base_information tpubi
+        ON tpubi.user_id = ubi.id AND tpubi.delete_flag='0'
+        LEFT JOIN integral_count ic
+        ON ic.uid=tpubi.AAA_id AND ic.delete_flag='0'
+        WHERE
+        ubi.user_type='01'
+        <if test="null!=phone">
+            AND ubi.phone=#{phone}
+        </if>
+        ORDER BY ubi.phone DESC
+
+    </select>
+
+
+    <select id="synchronizeUserInformation" resultType="com.tima.admin.vo.UserBaseInformationVO">
+        select
+        ubi.id,
+        ubi.`no`,
+        ubi.phone,
+        ubi.real_phone,
+        ubi.created_date,
+        ubi.delete_flag,
+        tpubi.AAA_id,
+        tpubi.tsp_id,
+        tpubi.token,
+        tpubi.username as AAAUserName,
+        tpubi.last_modified_date
+        from
+        user_base_information ubi
+        LEFT JOIN third_party_user_base_information tpubi ON ubi.id=tpubi.user_id
+        AND tpubi.delete_flag='0'
+        where
+        ubi.user_type='01'
+        AND ubi.delete_flag='0'
+        /*创建时间*/
+        <if test="null!=beginDate">
+            AND #{beginDate} &lt; ubi.created_date
+            order by ubi.created_date
+        </if>
+        /*第三方用户信息修改时间*/
+        <if test="null!=lastModifiedDate">
+            AND #{lastModifiedDate} &lt; tpubi.last_modified_date
+            order by tpubi.last_modified_date
+        </if>
+    </select>
+
+
+    <select id="selectAnniversaryBlessing" resultType="com.tima.admin.vo.UserBaseInformationVO">
+         SELECT
+            id,
+            no,
+            user_name,
+            sex,
+            user_code,
+            email,
+            phone,
+            created_date
+        FROM
+            user_base_information
+        WHERE
+            DATE_FORMAT( created_date, '%m-%d' ) = #{nowDate}
+	</select>
+
+
+    <select id="selectUserImg" resultType="com.tima.admin.vo.UserBaseInformationVO">
+       SELECT
+            A.id,
+            A.no,
+            A.user_name,
+            A.user_code,
+            A.password,
+            A.personal_signature,
+            B.image_url head_url
+        FROM
+            user_base_information A
+            LEFT JOIN image_relation B ON A.id = B.image_type_id
+        WHERE
+            A.delete_flag = 0
+        AND A.id=#{id}
+    </select>
+
+    <select id="selectUserThirdInfo" resultType="com.tima.admin.vo.UserBaseInformationVO">
+        SELECT
+            A.id,
+            A.NO,
+            A.user_name,
+            A.user_code,
+            A.PASSWORD,
+            A.personal_signature,
+            C.nick,
+            C.head_img headImage,
+            C.sex,
+            B.image_url head_url
+        FROM
+            user_base_information A
+            LEFT JOIN image_relation B ON A.id = B.image_type_id
+            LEFT JOIN third_party_user_login C on C.user_id=A.id
+        WHERE
+            A.delete_flag = 0
+        AND A.id=#{id}
+    </select>
+
+    <!-- <select id="selectVehicleCustomList" resultMap="VehicleCustomResultMap">
+        SELECT v.created_by, v.last_modified_by, v.color, v.driving_license_expired_date,
+        v.driving_license_no, v.engine_no, v.`no`, v.plate_license_no, v.`status`,
+        v.vin, s.`name` AS vehicle_series_name, b.`name` AS vehicle_brand_name, l.`no`
+        as vehicle_location_no, l.`name` as vehicle_location_name FROM vehicle v
+        LEFT JOIN vehicle_resource vr ON v.id = vr.vehicle_id LEFT JOIN location_resource
+        lr ON vr.location_resource_id = lr.id LEFT JOIN location l ON l.id = lr.location_id
+        LEFT JOIN vehicle_model vm ON v.model_id = vm.id LEFT JOIN series s ON v.series_id
+        = s.id LEFT JOIN brand b ON s.brand_id = b.id WHERE v.delete_flag = '0' <if
+        test="plateLicenseNo != null"> AND v.plate_license_no = #{plateLicenseNo}
+        </if> <if test="operationStatus != null"> AND vr.operation_status = #{operationStatus}
+        </if> <if test="vehicleLocationNo != null"> AND l.`no` = #{vehicleLocationNo}
+        </if> </select> -->
+</mapper>

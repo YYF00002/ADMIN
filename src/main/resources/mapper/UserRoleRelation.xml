@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tima.admin.mapper.UserRoleRelationMapper">
+
+	<!-- 通用查询映射结果 -->
+	<resultMap id="BaseResultMap"
+		type="com.tima.admin.entity.UserRoleRelation">
+		<id column="id" property="id" />
+		<result column="user_id" property="userId" />
+		<result column="user_role_id" property="userRoleId" />
+		<result column="status" property="status" />
+		<result column="created_by" property="createdBy" />
+		<result column="created_date" property="createdDate" />
+		<result column="last_modified_by" property="lastModifiedBy" />
+		<result column="last_modified_date" property="lastModifiedDate" />
+		<result column="version" property="version" />
+		<result column="delete_flag" property="deleteFlag" />
+	</resultMap>
+
+	<!-- 通用查询结果列 -->
+	<sql id="Base_Column_List">
+		id, user_id, user_role_id, status, created_by,
+		created_date,
+		last_modified_by, last_modified_date, version,
+		delete_flag
+	</sql>
+
+	<sql id="UserRole">
+		no, role_name, role_desc, role_code, role_type
+	</sql>
+
+
+
+	<!-- 根据角色查用户集合 -->
+	<select id="selectUserRoleRelationListPage"
+		resultType="com.tima.admin.vo.UserBaseInformationVO">
+		select
+		ubi.`no`,
+		ubi.user_name,
+		ubi.user_real_name, ubi.sex,
+		ubi.user_code, ubi.email, ubi.phone,
+		ubi.user_status, ubi.id_cards,
+		ubi.authentication_status, ubi.init_user,
+		ubi.user_down_time,
+		ubi.emergency_contact_name,
+		ubi.emergency_contact_phone,
+		ubi.user_type
+		FROM
+		user_role_relation urr
+		LEFT JOIN
+		user_base_information ubi ON
+		(urr.user_id=ubi.id)
+		AND
+		ubi.delete_flag='0'
+		LEFT JOIN
+		user_role ur ON
+		(urr.user_role_id=ur.id)
+		AND ur.delete_flag='0'
+		where
+		urr.delete_flag='0' AND
+		ubi.user_type='02' AND
+		urr.user_role_id=#{userRoleId}
+	</select>
+
+	<!-- 根据用户查角色 -->
+	<select id="selectUserRoleByUserListPage" resultType="com.tima.admin.vo.UserRoleVO">
+			SELECT
+			ur.id,
+		ur.NO,
+		ur.role_name,
+		ur.role_desc,
+		ur.role_code,
+		ur.role_type
+		FROM
+		user_role_relation urr
+		LEFT JOIN user_role ur ON ( urr.user_role_id = ur.id )
+		AND ur.delete_flag = '0' 
+		LEFT JOIN user_base_information ubi ON (ubi.id=urr.user_id)
+		AND ubi.delete_flag = '0' 
+		WHERE
+		urr.delete_flag = '0'  AND
+		ubi.user_type='02' 
+		AND urr.user_id = #{userId}
+	</select>
+	<!-- <select id="selectVehicleCustomList" resultMap="VehicleCustomResultMap"> 
+		SELECT v.created_by, v.last_modified_by, v.color, v.driving_license_expired_date, 
+		v.driving_license_no, v.engine_no, v.`no`, v.plate_license_no, v.`status`, 
+		v.vin, s.`name` AS vehicle_series_name, b.`name` AS vehicle_brand_name, l.`no` 
+		as vehicle_location_no, l.`name` as vehicle_location_name FROM vehicle v 
+		LEFT JOIN vehicle_resource vr ON v.id = vr.vehicle_id LEFT JOIN location_resource 
+		lr ON vr.location_resource_id = lr.id LEFT JOIN location l ON l.id = lr.location_id 
+		LEFT JOIN vehicle_model vm ON v.model_id = vm.id LEFT JOIN series s ON v.series_id 
+		= s.id LEFT JOIN brand b ON s.brand_id = b.id WHERE v.delete_flag = '0' <if 
+		test="plateLicenseNo != null"> AND v.plate_license_no = #{plateLicenseNo} 
+		</if> <if test="operationStatus != null"> AND vr.operation_status = #{operationStatus} 
+		</if> <if test="vehicleLocationNo != null"> AND l.`no` = #{vehicleLocationNo} 
+		</if> </select> -->
+</mapper>

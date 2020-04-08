@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tima.admin.mapper.LabelEntityMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.tima.admin.entity.LabelEntity">
+        <id column="id" property="id"/>
+        <result column="no" property="no"/>
+        <result column="uid" property="uid"/>
+        <result column="label_id" property="labelId"/>
+        <result column="describe" property="describe"/>
+        <result column="delete_flag" property="deleteFlag"/>
+        <result column="version" property="version"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, no, uid, label_id, describe, delete_flag, version, create_time, update_time
+    </sql>
+
+
+    <select id="selectupdateMemberLabel" resultType="com.tima.admin.entity.LabelEntity">
+          SELECT
+            le.id,
+            le.no,
+            le.uid,
+            le.label_id
+          FROM
+            label_entity le
+            LEFT JOIN label_info li ON li.id = le.label_id
+            AND li.delete_flag = '0'
+        WHERE
+            le.delete_flag = '0'
+            AND le.uid = #{uid}
+            AND li.attr_id =1
+ </select>
+
+
+
+    <select id="selectUserByLabel" resultType="com.tima.admin.vo.LabelEntityVO">
+        SELECT
+            le.id,
+            le.NO,
+            le.uid,
+            le.label_id,
+            ubi.no userNo
+        FROM
+        label_entity le
+        LEFT JOIN user_base_information ubi ON ubi.id=le.uid AND ubi.delete_flag='0'
+        WHERE
+        le.delete_flag='0'
+        AND
+        le.label_id in
+        <foreach item="labelId" index="index" collection="list" open="("
+                 separator="," close=")">
+            #{labelId}
+        </foreach>
+        group by le.uid
+    </select>
+
+    <!-- 
+    <select id="selectVehicleCustomList" resultMap="VehicleCustomResultMap">
+		SELECT
+		v.created_by,
+		v.last_modified_by,
+		v.color,
+		v.driving_license_expired_date,
+		v.driving_license_no,
+		v.engine_no,
+		v.`no`,
+		v.plate_license_no,
+		v.`status`,
+		v.vin,
+		s.`name` AS vehicle_series_name,
+		b.`name` AS vehicle_brand_name,
+	    l.`no` as vehicle_location_no,
+	    l.`name` as vehicle_location_name
+	FROM
+		vehicle v
+		LEFT JOIN vehicle_resource vr ON v.id = vr.vehicle_id
+		LEFT JOIN location_resource lr ON vr.location_resource_id = lr.id
+		LEFT JOIN location l ON l.id = lr.location_id
+		LEFT JOIN vehicle_model vm ON v.model_id = vm.id
+		LEFT JOIN series s ON v.series_id = s.id
+		LEFT JOIN brand b ON s.brand_id = b.id 
+	WHERE
+		v.delete_flag = '0'
+		 <if test="plateLicenseNo != null">
+		 AND v.plate_license_no = #{plateLicenseNo}
+		 </if>
+		 <if test="operationStatus != null">
+		 AND vr.operation_status = #{operationStatus}
+		 </if>
+		 <if test="vehicleLocationNo != null">
+		 AND l.`no` = #{vehicleLocationNo}
+		 </if>
+	</select>    
+     -->
+</mapper>

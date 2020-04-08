@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tima.admin.mapper.ThirdPartyUserLoginMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.tima.admin.entity.ThirdPartyUserLogin">
+        <id column="id" property="id"/>
+        <result column="no" property="no"/>
+        <result column="user_id" property="userId"/>
+        <result column="open_id" property="openId"/>
+        <result column="token" property="token"/>
+        <result column="type" property="type"/>
+        <result column="sex" property="sex"/>
+        <result column="refresh_token" property="refreshToken"/>
+        <result column="head_img" property="headImg"/>
+        <result column="nick" property="nick"/>
+        <result column="created_by" property="createdBy"/>
+        <result column="created_date" property="createdDate"/>
+        <result column="last_modified_by" property="lastModifiedBy"/>
+        <result column="last_modified_date" property="lastModifiedDate"/>
+        <result column="version" property="version"/>
+        <result column="delete_flag" property="deleteFlag"/>
+    </resultMap>
+
+
+    <select id="selectUserForphoneAndopenId" resultMap="BaseResultMap">
+        SELECT
+            tpuser.id,
+            ubi.phone
+        FROM
+            third_party_user_login tpuser
+            LEFT JOIN user_base_information ubi ON ubi.id = tpuser.user_id
+            AND ubi.delete_flag = 0
+        WHERE
+            tpuser.delete_flag = 0
+            	and tpuser.type=#{type}
+                <if test="phone!=null">
+                    AND ubi.phone=#{phone}
+                </if>
+
+    </select>
+
+
+</mapper>
